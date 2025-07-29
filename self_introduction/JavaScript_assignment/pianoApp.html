@@ -1,0 +1,222 @@
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../library/jquery-3.7.1.min.js"></script>
+    <title>最終課題「簡易ピアノアプリ」</title>
+</head>
+
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+        .songTitleDisplay {
+            height: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .pitchDisplay {
+            width: 300px;
+            height: 100px;
+            line-height: 100px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #800000;
+            background-color: #ffff80;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .keyboard_area {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+
+        .keyboard {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #303080;
+            border: 2px solid #808080;
+            text-align: center;
+        }
+
+        #autoPlayButton {
+            width: 200px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #5050b0;
+            border-radius: 10px;
+            margin: 20px auto;
+            text-align: center;
+        }
+    </style>
+
+    <div class="container">
+        <p class="songTitleDisplay"></p>
+        <!-- 音名表示エリア -->
+        <div class="pitchDisplay"></div>
+        <!-- 鍵盤（"C, D, E, F, G, A, B" の表記は、英語で "ド、レ、ミ、ファ、ソ、ラ、シ" に対応） -->
+        <div class="keyboard_area">
+            <div id="key_C" class="keyboard">ド</div>
+            <div id="key_D" class="keyboard">レ</div>
+            <div id="key_E" class="keyboard">ミ</div>
+            <div id="key_F" class="keyboard">ファ</div>
+            <div id="key_G" class="keyboard">ソ</div>
+            <div id="key_A" class="keyboard">ラ</div>
+            <div id="key_B" class="keyboard">シ</div>
+        </div>
+
+        <!-- 自動演奏ボタン -->
+        <div id="autoPlayButton">自動演奏</div>
+    </div>
+
+    <script>
+        let timeoutSet;         // setTimeout関数の取消に用いる。
+        let isAutoPlaying = 0;  // 0･･･手動演奏、1･･･自動演奏
+        let intervalID;         // setInterval関数の取消に用いる。
+
+        // きらきら星（songName：曲名、sheet：楽譜（本曲を含む全曲について、空文字は休符に対応）、timeInterval：楽譜内の要素一つごとの間隔（ミリ秒））
+        const TWINKLE_STAR = {
+            songName: 'きらきら星',
+            sheet: [
+                'ド', '', 'ド', '', 'ソ', '', 'ソ', '', 'ラ', '', 'ラ', '', 'ソ', 'ソ', 'ソ', 'ソ',
+                'ファ', '', 'ファ', '', 'ミ', '', 'ミ', '', 'レ', '', 'レ', '', 'ド', 'ド', 'ド', 'ド',
+                'ソ', '', 'ソ', '', 'ファ', '', 'ファ', '', 'ミ', '', 'ミ', '', 'レ', 'レ', 'レ', 'レ',
+                'ソ', '', 'ソ', '', 'ファ', '', 'ファ', '', 'ミ', '', 'ミ', '', 'レ', 'レ', 'レ', 'レ',
+                'ド', '', 'ド', '', 'ソ', '', 'ソ', '', 'ラ', '', 'ラ', '', 'ソ', 'ソ', 'ソ', 'ソ',
+                'ファ', '', 'ファ', '', 'ミ', '', 'ミ', '', 'レ', '', 'レ', '', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド'
+            ],
+            timeInterval: 500
+        };
+
+        // チューリップの歌（songName：曲名、sheet：楽譜、timeInterval：楽譜内の要素一つごとの間隔（ミリ秒））
+        const TULIP_SONG = {
+            songName: 'チューリップの歌',
+            sheet: [
+                'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'ミ', 'ミ', 'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'ミ', 'ミ',
+                'ソ', 'ソ', 'ミ', 'ミ', 'レ', 'レ', 'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'レ', 'レ', 'レ', 'レ',
+                'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'ミ', 'ミ', 'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'ミ', 'ミ',
+                'ソ', 'ソ', 'ミ', 'ミ', 'レ', 'レ', 'ド', 'ド', 'レ', 'レ', 'ミ', 'ミ', 'ド', 'ド', 'ド', 'ド',
+                'ソ', '', 'ソ', '', 'ミ', '', 'ソ', '', 'ラ', '', 'ラ', '', 'ソ', 'ソ', 'ソ', 'ソ',
+                'ミ', '', 'ミ', '', 'レ', '', 'レ', '', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド'
+            ],
+            timeInterval: 250
+        };
+
+        // カエルの歌（songName：曲名、sheet：楽譜、timeInterval：楽譜内の要素一つごとの間隔（ミリ秒））
+        const FROG_SONG = {
+            songName: 'カエルの歌',
+            sheet: [
+                'ド', 'ド', 'ド', 'ド', 'レ', 'レ', 'レ', 'レ', 'ミ', 'ミ', 'ミ', 'ミ', 'ファ', 'ファ', 'ファ', 'ファ',
+                'ミ', 'ミ', 'ミ', 'ミ', 'レ', 'レ', 'レ', 'レ', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド',
+                'ミ', 'ミ', 'ミ', 'ミ', 'ファ', 'ファ', 'ファ', 'ファ', 'ソ', 'ソ', 'ソ', 'ソ', 'ラ', 'ラ', 'ラ', 'ラ',
+                'ソ', 'ソ', 'ソ', 'ソ', 'ファ', 'ファ', 'ファ', 'ファ', 'ミ', 'ミ', 'ミ', 'ミ', 'ミ', 'ミ', 'ミ', 'ミ',
+                'ド', 'ド', 'ド', 'ド', '', '', '', '', 'ド', 'ド', 'ド', 'ド', '', '', '', '',
+                'ド', 'ド', 'ド', 'ド', '', '', '', '', 'ド', 'ド', 'ド', 'ド', '', '', '', '',
+                'ド', '', 'ド', '', 'レ', '', 'レ', '', 'ミ', '', 'ミ', '', 'ファ', '', 'ファ', '',
+                'ミ', 'ミ', 'ミ', 'ミ', 'レ', 'レ', 'レ', 'レ',
+                'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド', 'ド'
+            ],
+            timeInterval: 250
+        };
+
+        // 曲名の配列
+        const SONGS = [TWINKLE_STAR, TULIP_SONG, FROG_SONG];
+
+        // 各鍵盤とそれぞれに対応する音名をまとめたもの（id：鍵盤のID、pitchName：鍵盤ごとの音名）
+        const KEYS = [
+            {id: '#key_C', pitchName: 'ド'},
+            {id: '#key_D', pitchName: 'レ'},
+            {id: '#key_E', pitchName: 'ミ'},
+            {id: '#key_F', pitchName: 'ファ'},
+            {id: '#key_G', pitchName: 'ソ'},
+            {id: '#key_A', pitchName: 'ラ'},
+            {id: '#key_B', pitchName: 'シ'}
+        ];
+
+        // 押下された鍵盤に応じて、表示する音名を変更（key：押下された鍵盤に対応、id：鍵盤のID）
+        KEYS.forEach((key) => {
+            $(`${key.id}`).click(() => displayNote(key.pitchName));
+        });
+
+        $('#autoPlayButton').click(togglePlaybackMode);
+
+        // 手動演奏と自動演奏を切り替え、それに応じて実行する関数を変更。
+        function togglePlaybackMode() {
+            isAutoPlaying = !isAutoPlaying;
+
+            if (isAutoPlaying) {
+                startAutoPlay();
+            } else {
+                stopAutoPlay();
+            }
+        }
+
+        // 押下された鍵盤の音名を表示（pitchName：鍵盤の音名）
+        function displayNote(pitchName) {
+            clearTimeout(timeoutSet);
+            $('.pitchDisplay').text(pitchName);
+            timeoutSet = setTimeout(clearDisplayNote, 1000);
+        }
+
+        // 音名の表示を消す
+        function clearDisplayNote() {
+            $('.pitchDisplay').text('');
+        }
+
+        // 「自動演奏」に切り替える際に実行する関数
+        function startAutoPlay() {
+            clearTimeout(timeoutSet);                       // 鍵盤を押下してすぐに「自動演奏」を押下すると、音名が即消えることがあるため、それを防ぐために追加。
+            $('.keyboard').prop('inert', true);
+            $('.keyboard').css('background-color', '#bbb');
+            $('#autoPlayButton').text('演奏中止');
+            clearDisplayNote();
+            let currentSongIndex = Math.round(Math.random() * (SONGS.length - 1));  // 演奏する曲の番号（0･･･きらきら星、1･･･チューリップの歌、2･･･カエルの歌）
+            let noteIndex = 0;                                                      // 楽譜の順番
+
+            $('.songTitleDisplay').text(`自動演奏中です：${SONGS[currentSongIndex].songName}`); // 自動演奏中の曲名を表示
+
+            // 曲を演奏
+            intervalID = setInterval(() => {
+                // 演奏終了後もしくは「演奏中止」を押下時の処理に対応。
+                if (noteIndex >= SONGS[currentSongIndex].sheet.length || !isAutoPlaying) {
+                    isAutoPlaying = 0;
+                    stopAutoPlay();
+                } else {
+                    $('.pitchDisplay').text(SONGS[currentSongIndex].sheet[noteIndex])
+                    noteIndex++;
+                }
+            }, SONGS[currentSongIndex].timeInterval);
+        }
+
+        // 「手動演奏」に切り替える際に実行する関数
+        function stopAutoPlay() {
+            $('.keyboard').prop('inert', false);
+            $('.keyboard').css('background-color', '#fff');
+            $('#autoPlayButton').text('自動演奏');
+            $('.songTitleDisplay').text('');
+            clearInterval(intervalID);
+            clearDisplayNote();
+        }
+
+    </script>
+</body>
+
+</html>

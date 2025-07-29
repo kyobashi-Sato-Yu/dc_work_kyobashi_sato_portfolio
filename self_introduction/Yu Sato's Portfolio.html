@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Yu Sato's Portfolio</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="Yu Sato's Portfolio.css">
+        <script src="library/jquery-3.7.1.min.js"></script>
+
+        <script>
+            window.onload = function () {
+                // スムーススクロールの実装
+                $(".header-selfIntro").click(() => scrollToHeading("#self-introduction"));
+                $(".header-impleSample").click(() => scrollToHeading("#implementation-sample"));
+
+                // 該当するID名を持つ場所までスムーススクロール
+                function scrollToHeading(idName) {
+                    window.scrollTo({
+                        top: $(idName).offset().top,
+                        left: $(idName).offset().left,
+                        behavior: "smooth",
+                    });
+                }
+
+                // ハンバーガーメニューの開閉の切り替え
+                $("#burger-iconArea").click(toggleBurgerVisible);
+            }
+
+            window.onresize = function () {
+                if (!window.matchMedia("(max-width: 768px)").matches) {
+                    // ウィンドウサイズが768pxより大きくなった時、ハンバーガーメニューを非表示に。
+                    $("#burger-menuArea").css("display", "none");
+                    $("#back-layer").css("display", "none");
+                    closeBurgerMenu();
+                } else {
+                    $("#burger-menuArea").css("display", "block");
+                }
+            }
+
+            let isBurgerVisible = false;                // ハンバーガーメニューの表示/非表示を表す（true...表示、false...非表示）
+
+            // ハンバーガーメニューの開閉を切り替える関数
+            function toggleBurgerVisible() {
+                if (!isBurgerVisible) {
+                    openBurgerMenu();
+                } else {
+                    closeBurgerMenu();
+                }
+            }
+
+            // ハンバーガーメニューを表示させる（ハンバーガーメニューのアイコンは×ボタンに変更）
+            function openBurgerMenu() {
+                isBurgerVisible = true;
+                $(".bar-upper").css("transform", "translateY(13px) rotateZ(45deg)");
+                $(".bar-lower").css("transform", "translateY(-13px) rotateZ(-45deg)");
+                $(".bar-middle").css("opacity", "0");
+                $("#burger-menuArea").css("transform", "translateX(40%)");
+                $("#back-layer").fadeIn();
+            }
+
+            // ハンバーガーメニューを非表示にする
+            function closeBurgerMenu() {
+                isBurgerVisible = false;
+                $(".bar-upper").css("transform", "translateY(0px) rotateZ(0deg)");
+                $(".bar-lower").css("transform", "translateY(0px) rotateZ(0deg)");
+                $(".bar-middle").css("opacity", "1");
+                $("#burger-menuArea").css("transform", "translateX(100%)");
+                $("#back-layer").fadeOut();
+            }
+        </script>
+    </head>
+    <body>
+        <!-- ヘッダー -->
+        <header>
+            <h1><span>Y</span>u <span>S</span>ato's Portfolio</h1>
+            <ul class="menu">
+                <li class="header-selfIntro">自己紹介</li>
+                <li class="header-impleSample">実装サンプル</li>
+            </ul>
+
+            <!-- ハンバーガーメニュー -->
+            <button id="burger-iconArea">
+                <div class="burger-bar bar-upper"></div>
+                <div class="burger-bar bar-middle"></div>
+                <div class="burger-bar bar-lower"></div>
+            </button>
+
+            <div id="burger-menuArea">
+                <div><p class="header-selfIntro">自己紹介</p></div>
+                <div><p class="header-impleSample">実装サンプル</p></div>
+            </div>
+
+            <div class="clear"></div>
+        </header>
+
+        <div id="back-layer"></div>
+
+        <main>
+            <!-- メイン画像 -->
+            <div class="main-view"></div>
+
+            <!-- ここに最初の挨拶を入れることも検討。 -->
+
+            <!-- 自己紹介 -->
+            <div class="content-area" id="self-introduction">
+                <div class="selfIntro-contents">
+                    <h2 class="main-heading">自己紹介<br/><span>Self Introduction</span></h2>
+                    <p class="selfIntro-text">私の名前は<span>佐藤優</span>です。大阪府に約20年住んでいますが、岡山県生まれの広島県育ちです。現在、ディーキャリアITエキスパート京橋オフィスにて、プログラミング学習や、障害特性への向き合い方、社会人として必要な知識を学ぶ訓練に取り組んでおります。<br/>また、「広汎性発達障害」の診断が出ています。<br/>よろしくお願いいたします。</p>
+                    <img class="selfIntro-img" src="images/self-portrait.jpg" alt="自画像">
+                </div>
+
+                <!-- ↓　今後、デザインを丸ごと変えたい場所　↓ -->
+                <div class="selfIntro-listArea">
+                    <!-- スキル -->
+                    <div class="selfIntro-lists">
+                        <h3 class="selfIntro-title">スキル<br/><span>Skills</span></h3>
+                        <ul class="selfIntro-list">
+                            <li>HTML/CSS</li>
+                            <li>JavaScript</li>
+                        </ul>
+                    </div>
+
+                    <!-- 趣味 -->
+                    <div class="selfIntro-lists">
+                        <h3 class="selfIntro-title">趣味<br/><span>Favorites</span></h3>
+                        <ul class="selfIntro-list">
+                            <li>天気/気象</li>
+                            <li>鉄道の撮影</li>
+                            <li>テレビゲーム</li>
+                        </ul>
+                    </div>
+
+                    <!-- 学歴/職歴　障害特性 の挿入を検討 -->
+                </div>
+            </div>
+
+            <!-- 実装サンプル -->
+            <div class="content-area" id="implementation-sample">
+                <h2 class="main-heading">実装サンプル<br/><span>Sample</span></h2>
+
+                <!-- 画像ギャラリー -->
+                <div class="imple-contents">
+                    <h3 class="imple-subtitle">画像ギャラリー</h3>
+                    <div class="photo-contents">
+                        <div class="photo-area">
+                            <img src="images/rainbow.jpg" alt="画像「朝の虹」">
+                            <h4>朝の虹</h4>
+                            <p>数年前の朝、自宅の西の空に現れた虹です。</p>
+                        </div>
+                        <div class="photo-area">
+                            <img src="images/blossoms-moon.JPEG" alt="画像「夜桜と月」">
+                            <h4>夜桜と月</h4>
+                            <p>数年前に撮影した、自宅のマンション内にある桜と月のコラボレーションです。</p>
+                        </div>
+                        <div class="photo-area">
+                            <img src="images/BlueRockThrush.JPEG" alt="画像「野生の鳥」">
+                            <h4>野生の鳥</h4>
+                            <p>地元でよく見かける野生の鳥です。写真のように、マンション内の手すりに止まることもあります。</p>
+                        </div>
+                        <div class="photo-area">
+                            <img src="images/hankyu-train.JPG" alt="画像「阪急電鉄の特急」">
+                            <h4>阪急電鉄の特急</h4>
+                            <p>大阪と京都を結ぶ、阪急電鉄の特急列車です。京都の文化を取り入れたデザインになっています。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 訓練課題 -->
+                <div class="imple-contents">
+                    <h3 class="imple-subtitle">訓練課題</h3>
+                    <div class="assignment-contents">
+                        <div class="assignment-area">
+                            <h4 class="assignment-title">JavaScript：簡易ピアノアプリ</h4>
+                            <a href="JavaScript_assignment/pianoApp.html" target="_blank"><img src="images/JavaScript_pianoApp.png" alt="JavaScript最終課題スクリーンショット"></a>
+                            <div class="assignment-description">
+                                <div>
+                                    <h5>機能</h5>
+                                    <p>
+                                        手動演奏機能<br/>
+                                        ①鍵盤を押下すると、黄色の枠内に押された音名が1秒間表示されます（以下、この挙動を「演奏」と表記します。別の鍵盤を押下すると音名はすぐ置き換わります。）。<br/>
+                                        自動演奏機能<br/>
+                                        ①「自動演奏」ボタンを押下すると、「きらきら星」「チューリップの歌」「カエルの歌」の3曲のいずれかがランダムに演奏されます（以下、この挙動を「自動演奏」と表記します。）。<br/>
+                                        ②「演奏中止」ボタンを押下する、もしくは演奏が最後まで終わると、自動演奏は終了します。<br/>
+                                        ※自動演奏中のみ、「自動演奏」ボタンは「演奏中止」ボタンに切り替わります。<br/>
+                                        ※自動演奏中は、画面上部に「自動演奏中です：曲名」と表示されます。<br/>
+                                        ※自動演奏中は、鍵盤を押下できません。<br/>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h5>工夫点</h5>
+                                    <p>見やすいかつほどほどに鮮やかなデザインとなるような配色にしました。また、音名表示の場所は、注目されやすいよう柔らかい黄色としました。なお、音を鳴らすのではなく音名を表示させるのみであるため、曲は簡単なものにしています。</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="assignment-area">
+                            <h4 class="assignment-title">JavaScript：ストップウォッチ</h4>
+                            <a href="JavaScript_assignment/stopwatch.html" target="_blank"><img src="images/JavaScript_stopwatch.png" alt="JavaScript最終課題スクリーンショット"></a>
+                            <div class="assignment-description">
+                                <div>
+                                    <h5>機能</h5>
+                                    <p>
+                                        ①初期状態では、上の画像のような表示になっています（薄くなっているボタンは押下できない状態です）。<br/>
+                                        ②「Start」ボタンを押下時、計測を開始します。<br/>
+                                        ③「Stop」ボタンを押下時、計測を一時停止します。<br/>
+                                        ④再度「Start」ボタンを押下時、計測を再開します。<br/>
+                                        ⑤「Reset」ボタンを押下時、初期表示に戻します。
+                                        ※表示形式は「分 : 秒 . ミリ秒」で、2桁表示にしています。<br/>
+                                        ※「Start」ボタンは、計測中は押下できません。<br/>
+                                        ※「Stop」ボタンは計測していない状態では押下できません。<br/>
+                                        ※「Reset」ボタンは、計測を一時停止している状態でないと押下できません。<br/>
+                                    </p>
+                                </div>
+                                <div>
+                                    <h5>工夫点</h5>
+                                    <p>ポートフォリオの一部として、統一感が出るよう青色の系統を採用しました。（今後変更予定）</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- フッター -->
+        <footer>
+            <p>Copyright © 2025 Yu Sato</p>
+        </footer>
+    </body>
+</html>

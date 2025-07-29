@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>中間課題：ストップウォッチ</title>
+    </head>
+    <body>
+        <style>
+            .stopwatch_area {
+                background-color: #00ff00;
+                width: 500px;
+                border-radius: 15px;
+                margin: 30px auto;
+                max-width: 90%;
+            }
+
+            .content-area {
+                padding: 30px;
+            }
+
+            #time_display {
+                color: #fff;
+                background-color: #000;
+                border-radius: 15px;
+                height: 150px;
+                line-height: 150px;
+                font-size: 72px;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .buttons {
+                text-align: center;
+                display: flex;
+                margin-top: 10px;
+            }
+
+            .button {
+                color: #fff;
+                background-color: #000;
+                border-radius: 15px;
+                height: 60px;
+                flex: 1;
+                font-size: 24px;
+            }
+
+            .button:disabled {
+                opacity: 0.3;
+            }
+        </style>
+
+        <div class="stopwatch_area">
+            <div class="content-area">
+                <div id="time_display">00:00.00</div>
+                <div class="buttons">
+                    <input id="start" class="button" type="button" value="Start"></button>
+                    <input id="stop" class="button" type="button" value="Stop" disabled></button>
+                    <input id="reset" class="button" type="button" value="Reset" disabled></button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let timer;
+            let time_val = 0;   // 時間を表す値（秒単位）
+
+            const time_display = document.getElementById("time_display");
+            const start = document.getElementById("start");
+            const stop  = document.getElementById("stop");
+            const reset = document.getElementById("reset");
+
+            start.addEventListener("click", timerStart);
+            stop.addEventListener("click", timerStop);
+            reset.addEventListener("click", timerReset);
+
+            // 「Start」押下時に実行する関数。
+            function timerStart() {
+                start.disabled = true;
+                stop.disabled  = false;
+                reset.disabled = true;
+
+                // ミリ秒の表示は2桁目より上位のみなので、それに合わせる。（合わせないと、カウントが正確にならない）
+                timer = setInterval(count_up, 10);
+            }
+
+            // 「Stop」押下時に実行する関数 
+            function timerStop() {
+                start.disabled = false;
+                stop.disabled  = true;
+                reset.disabled = false;
+
+                clearInterval(timer);
+            }
+
+            // 「reset」押下時に実行する関数（初期表示に戻す）
+            function timerReset() {
+                clearInterval(timer);
+
+                time_val = 0;
+                time_display.textContent = "00:00.00";
+                reset.disabled = true;
+            }
+
+            // ミリ秒単位でカウントアップし、都度画面に表示。
+            function count_up() {
+                time_val += 10;
+
+                let time_min = Math.floor(time_val / 60000);                                            // 分単位の箇所
+                let time_sec = Math.floor((time_val - time_min * 60000) / 1000);                        // 秒単位の箇所
+                let time_millisec = Math.floor((time_val - time_min * 60000 - time_sec * 1000) / 10);   // ミリ秒の箇所（表示は2桁目より上位のみ）
+
+                // カウントを0埋めの2桁表示にする
+                time_display.textContent = String(time_min).padStart(2,"0") + ":" + String(time_sec).padStart(2,"0") + "." + String(time_millisec).padStart(2,"0");
+            }
+
+        </script>
+    </body>
+</html>
